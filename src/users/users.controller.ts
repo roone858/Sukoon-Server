@@ -29,11 +29,11 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @UseGuards(AuthGuard('jwt'))
-  @UseGuards(AdminGuard)
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   findAll() {
     return this.usersService.findAll();
   }
+
   @Post()
   @UseGuards(AuthGuard('jwt'))
   @UseGuards(AdminGuard)
@@ -55,6 +55,8 @@ export class UsersController {
   ) {
     return this.usersService.updateUser(userId, updateUserDto);
   }
+
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Delete(':userId')
   @UseGuards(AdminGuard)
   deleteUserByAdmin(@Param('userId') userId: string) {

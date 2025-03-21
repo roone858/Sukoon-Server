@@ -47,7 +47,8 @@ export class AuthService {
   async signUp(
     createUserDto: CreateUserDto,
   ): Promise<{ access_token: string }> {
-    createUserDto.profilePicture = 'default-profile-picture.webp';
+    createUserDto.profilePicture =
+      process.env.SERVER_BASE_URL + 'default-profile-picture.webp';
     const newUser = await this.usersService.create(createUserDto);
     const token = await this.generateToken(newUser._id.toString());
 
