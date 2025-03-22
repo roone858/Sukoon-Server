@@ -43,11 +43,7 @@ export class CartService {
         (item) => item.productId === updatedItem.productId,
       );
       if (existingItem) {
-        // existingItem.quantity = updatedItem.quantity ?? existingItem.quantity; // استخدم الكمية الحالية إذا لم تُرسل
-        existingItem.quantity =
-          updatedItem.quantity !== undefined
-            ? updatedItem.quantity
-            : existingItem.quantity + 1;
+        existingItem.quantity = updatedItem.quantity ?? existingItem.quantity; // استخدم الكمية الحالية إذا لم تُرسل
       } else {
         cart.items.push({
           productId: updatedItem.productId,
