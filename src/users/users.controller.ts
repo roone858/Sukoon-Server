@@ -58,7 +58,6 @@ export class UsersController {
 
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Delete(':userId')
-  @UseGuards(AdminGuard)
   deleteUserByAdmin(@Param('userId') userId: string) {
     return this.usersService.delete(userId);
   }

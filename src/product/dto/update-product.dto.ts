@@ -8,7 +8,7 @@ export class UpdateProductDto {
   @IsOptional()
   description?: string;
 
-  @IsNumber()
+  @IsString()
   @IsOptional()
   price?: number;
 

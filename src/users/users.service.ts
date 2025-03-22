@@ -32,7 +32,10 @@ export class UsersService {
   async delete(id: string) {
     const user = await this.userModel.findByIdAndDelete(id);
     if (!user) throw new NotFoundException('User not found');
-    return user;
+
+    const { password, ...safeUser } = user.toObject(); // إزالة كلمة المرور
+
+    return safeUser;
   }
 
   async findByEmail(email: string) {

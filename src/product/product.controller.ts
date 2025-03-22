@@ -156,6 +156,7 @@ export class ProductController {
     const newImagesUrl = newImages.map(
       (file) => process.env.SERVER_BASE_URL + '/products/' + file.filename,
     );
+    console.log(updateProduct);
     return this.productService.update(id, updateProduct, newImagesUrl);
     // return this.productService.update(id, body);
   }

@@ -42,7 +42,11 @@ export class AuthController {
   async signup(@Body() createUserDto: CreateUserDto) {
     // Call your AuthService to handle user creation and authentication
     const result = await this.authService.signUp(createUserDto);
-    return { success: true, user: result };
+    return {
+      success: true,
+      access_token: result.access_token,
+      user: result.user,
+    };
   }
   @Post('check-username')
   async checkUsername(

@@ -6,7 +6,7 @@ import {
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { UserDocument } from 'src/users/schemas/user.schema';
+import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { MailService } from 'src/mail/mail.service';
 import { CreateGoogleUserDto } from './strategies/dto/create-google-user.dto';
 import { CreateFacebookUserDto } from './strategies/dto/create-facebook-user.dto';
@@ -46,7 +46,7 @@ export class AuthService {
   /** 📝 User Sign-Up */
   async signUp(
     createUserDto: CreateUserDto,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ access_token: string; user: Omit<User, 'password'> }> {
     createUserDto.profilePicture =
       process.env.SERVER_BASE_URL + 'default-profile-picture.webp';
     const newUser = await this.usersService.create(createUserDto);
@@ -58,7 +58,7 @@ export class AuthService {
     //   token.access_token,
     // );
 
-    return token;
+    return { access_token: token.access_token, user: newUser };
   }
 
   /** 📩 Confirm Email */
