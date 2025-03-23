@@ -38,19 +38,7 @@ export class CartService {
       });
     }
 
-    updateCartDto.items.forEach((updatedItem) => {
-      const existingItem = cart.items.find(
-        (item) => item.productId === updatedItem.productId,
-      );
-      if (existingItem) {
-        existingItem.quantity = updatedItem.quantity ?? existingItem.quantity; // استخدم الكمية الحالية إذا لم تُرسل
-      } else {
-        cart.items.push({
-          productId: updatedItem.productId,
-          quantity: updatedItem.quantity ?? 1, // تعيين `1` إذا لم يتم تحديد كمية
-        });
-      }
-    });
+    cart.items = updateCartDto.items;
 
     cart.updatedAt = new Date();
     return cart.save();

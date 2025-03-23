@@ -7,7 +7,6 @@ import {
   Delete,
   Patch,
   UseGuards,
-  ForbiddenException,
   Req,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
@@ -25,22 +24,16 @@ export class CartController {
     return this.cartService.createOrUpdateCart(createCartDto);
   }
 
-  @Get(':userId')
-  getCart(@Param('userId') userId: string) {
+  @Get()
+  getCart(@Req() req: any) {
+    const userId = req.user._id;
     return this.cartService.getCartByUserId(userId);
   }
 
-  @Patch(':userId')
-  updateCart(
-    @Param('userId') userId: string,
-    @Body() updateCartDto: UpdateCartDto,
-    @Req() req: any,
-  ) {
-    const loggedInUserId = req.user._id;
+  @Patch()
+  updateCart(@Body() updateCartDto: UpdateCartDto, @Req() req: any) {
+    const userId = req.user._id;
 
-    if (userId !== loggedInUserId.toString()) {
-      throw new ForbiddenException('You can only update your own cart'); // منع التعديل على سلات الآخرين
-    }
     return this.cartService.updateCart(userId, updateCartDto);
   }
 

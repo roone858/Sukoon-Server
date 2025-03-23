@@ -12,8 +12,20 @@ class UpdateCartItemDto {
   productId: string;
 
   @IsNumber()
+  @IsNotEmpty()
+  quantity: number;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
+
+  @IsString()
   @IsOptional()
-  quantity?: number;
+  image?: string;
 }
 
 export class UpdateCartDto {
