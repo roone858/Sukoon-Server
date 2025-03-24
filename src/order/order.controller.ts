@@ -6,9 +6,12 @@ import {
   Body,
   Patch,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { AdminGuard } from 'src/users/guards/admin.guard';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('orders')
 export class OrderController {
@@ -19,6 +22,7 @@ export class OrderController {
     return this.orderService.createOrder(createOrderDto);
   }
 
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Get()
   findAll() {
     return this.orderService.getAllOrders();
@@ -34,6 +38,7 @@ export class OrderController {
     return this.orderService.updateOrderStatus(id, status);
   }
 
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.orderService.deleteOrder(id);
