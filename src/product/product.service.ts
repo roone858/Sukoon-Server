@@ -8,6 +8,8 @@ import sizeOf from 'image-size';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 
+import { v2 as cloudinary } from 'cloudinary';
+
 @Injectable()
 export class ProductService {
   constructor(
@@ -40,54 +42,76 @@ export class ProductService {
   }
 
   /** ✏️ Update a product */
+
+  /** ✏️ Update a product with Cloudinary */
   async update(
     id: string,
     updateProduct: UpdateProductDto,
     newImagesUrl: string[],
   ): Promise<Product | null> {
     const product = await this.productModel.findById(id).exec();
-    const removedImage = product.images.filter(
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    // حذف الصور المحذوفة من Cloudinary
+    const removedImages = product.images.filter(
       (image: string) => !updateProduct.images.includes(image),
     );
-    removedImage.forEach((imageUrl) => {
-      const filePath = path.join(
-        __dirname,
-        '..',
-        '..',
-        'images',
-        imageUrl.split('/').pop(),
-      );
-      fs.unlink(filePath, (err) => {
-        if (err) console.error(`Error deleting file: ${err.message}`);
-      });
-    });
+
+    await Promise.all(
+      removedImages.map(async (imageUrl) => {
+        try {
+          const publicId = this.extractPublicIdFromUrl(imageUrl);
+          await cloudinary.uploader.destroy(publicId);
+        } catch (err) {
+          console.error(`Error deleting file from Cloudinary: ${err.message}`);
+        }
+      }),
+    );
+
+    // تحديث الصور مع إضافة الصور الجديدة
     updateProduct.images = [...updateProduct.images, ...newImagesUrl];
+
     return this.productModel
       .findByIdAndUpdate(id, updateProduct, { new: true })
       .exec();
   }
 
-  /** ❌ Delete a product and remove associated file */
+  /** ❌ Delete a product and remove associated files from Cloudinary */
   async delete(id: string): Promise<Product | null> {
     const product = await this.productModel.findById(id).exec();
+
     if (!product) {
       throw new NotFoundException('Product not found');
     }
-    product.images.forEach((imageUrl) => {
-      const filePath = path.join(
-        __dirname,
-        '..',
-        '..',
-        'images',
-        imageUrl.split('/').pop(),
-      );
-      fs.unlink(filePath, (err) => {
-        if (err) console.error(`Error deleting file: ${err.message}`);
-      });
-    });
-    // Remove the associated file
+
+    // حذف جميع الصور المرتبطة من Cloudinary
+    await Promise.all(
+      product.images.map(async (imageUrl) => {
+        try {
+          const publicId = this.extractPublicIdFromUrl(imageUrl);
+          await cloudinary.uploader.destroy(publicId);
+        } catch (err) {
+          console.error(`Error deleting file from Cloudinary: ${err.message}`);
+        }
+      }),
+    );
 
     return this.productModel.findByIdAndDelete(id).exec();
+  }
+
+  /**
+   * استخراج Public ID من رابط Cloudinary
+   * @param url رابط الصورة من Cloudinary
+   * @returns Public ID المستخدم في Cloudinary
+   */
+  private extractPublicIdFromUrl(url: string): string {
+    // مثال: https://res.cloudinary.com/demo/image/upload/v1234567/sample.jpg
+    // ستعيد 'sample'
+    const matches = url.match(/upload\/(?:v\d+\/)?([^\.]+)/);
+    return matches ? matches[1] : '';
   }
 
   /** 📏 Calculate image details */

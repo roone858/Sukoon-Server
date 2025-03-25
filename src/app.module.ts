@@ -9,7 +9,7 @@ import { ProductModule } from './product/product.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
-
+import { v2 as cloudinary } from 'cloudinary';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,6 +25,16 @@ import { OrderModule } from './order/order.module';
   ],
   controllers: [AppController],
 
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: 'CLOUDINARY',
+      useValue: cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+      }),
+    },
+  ],
 })
 export class AppModule {}
