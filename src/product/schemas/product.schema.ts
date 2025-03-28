@@ -1,25 +1,75 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Product extends Document {
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   name: string;
 
-  @Prop()
+  @Prop({ required: true, trim: true })
   description: string;
 
-  @Prop({ required: true })
+  @Prop({
+    required: true,
+    type: Number,
+    set: (v: any) => parseFloat(v) || 0,
+  })
   price: number;
 
-  @Prop({ default: 0 })
+  @Prop({
+    required: true,
+    type: Number,
+    set: (v: any) => parseInt(v) || 0,
+  })
   stock: number;
 
-  @Prop()
-  category: string;
+  @Prop({
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100,
+    set: (v: any) => parseFloat(v) || 0,
+  })
+  discount: number;
 
-  @Prop([String])
-  images: string[];
+  @Prop({
+    type: Date,
+    default: null,
+  })
+  discountEndDate?: Date;
+
+  @Prop({ type: [String], default: [] })
+  tags?: string[];
+
+  @Prop({ type: [String], required: true })
+  categories: string[];
+
+  @Prop([
+    {
+      public_id: String,
+      url: String,
+      altText: String,
+    },
+  ])
+  images?: Array<{
+    public_id?: string;
+    url?: string;
+    altText?: string;
+  }>;
+
+  // Virtual for final price after discount
+  public get finalPrice(): number {
+    return this.price * (1 - this.discount / 100);
+  }
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
+ProductSchema.virtual('finalPrice').get(function () {
+  return this.price * (1 - this.discount / 100);
+});
+
+export type ProductDocument = Product &
+  Document & {
+    createdAt: Date;
+    updatedAt: Date;
+  };
