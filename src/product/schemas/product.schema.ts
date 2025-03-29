@@ -44,6 +44,32 @@ export class Product extends Document {
   @Prop({ type: [String], required: true })
   categories: string[];
 
+  @Prop({
+    type: [
+      {
+        size: {
+          width: { type: Number, required: true },
+          height: { type: Number, required: true },
+          label: { type: String, required: true },
+        },
+        price: { type: Number, required: true },
+        stock: { type: Number, default: 0 },
+        isAvailable: { type: Boolean, default: true },
+      },
+    ],
+    _id: false,
+  })
+  dimensions: {
+    size: {
+      width: number;
+      height: number;
+      label: string;
+    };
+    price: number;
+    stock?: number;
+    isAvailable?: boolean;
+  }[];
+
   @Prop([
     {
       public_id: String,

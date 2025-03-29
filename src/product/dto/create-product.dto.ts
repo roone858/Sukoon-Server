@@ -11,6 +11,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
+import { DimensionDto } from './dimension.dto';
 
 class ImageDto {
   @IsOptional()
@@ -61,6 +62,10 @@ export class CreateProductDto {
   @IsString({ each: true })
   @MaxLength(30, { each: true })
   categories: string[];
+
+  @IsArray()
+  @Type(() => DimensionDto)
+  dimensions: DimensionDto[];
 
   @IsOptional()
   @IsNumber()

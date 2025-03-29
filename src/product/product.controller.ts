@@ -38,7 +38,12 @@ export class ProductController {
     if (!files || files.length === 0) {
       throw new BadRequestException('At least one image is required');
     }
-    // console.log(createProductDto);
+    console.log(createProductDto);
+    if (typeof createProductDto.dimensions === 'string') {
+      console.log('transaction');
+      createProductDto.dimensions = JSON.parse(createProductDto.dimensions);
+    }
+    console.log(createProductDto);
     return this.productService.createWithImages(createProductDto, files);
   }
 

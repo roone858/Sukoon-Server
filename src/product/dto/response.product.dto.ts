@@ -1,5 +1,6 @@
 // product.dto.ts
 import { Expose, Transform, Type } from 'class-transformer';
+import { DimensionDto } from './dimension.dto';
 class ProductImageDto {
   @Expose()
   public_id?: string;
@@ -30,6 +31,9 @@ export class ProductResponseDto {
 
   @Expose()
   discountEndDate?: Date;
+
+  @Expose()
+  dimensions?: DimensionDto[];
 
   @Transform(({ obj }) => obj.price * (1 - (obj.discount || 0) / 100))
   @Expose()

@@ -45,6 +45,7 @@ export class ProductService {
       stock: product.stock,
       discount: product.discount,
       discountEndDate: product.discountEndDate,
+      dimensions: product.dimensions,
       finalPrice:
         product.finalPrice ??
         product.price * (1 - (product.discount || 0) / 100),
