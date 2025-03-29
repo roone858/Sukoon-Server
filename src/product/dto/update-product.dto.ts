@@ -11,6 +11,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Transform } from 'class-transformer';
+import { DimensionDto } from './dimension.dto';
 
 class ImageDto {
   @IsOptional()
@@ -79,6 +80,11 @@ export class UpdateProductDto {
   @ValidateNested({ each: true })
   @Type(() => ImageDto)
   images?: ImageDto[];
+
+  @IsOptional()
+  @IsArray()
+  @Type(() => DimensionDto)
+  dimensions: DimensionDto[];
 
   @IsOptional()
   @IsArray()

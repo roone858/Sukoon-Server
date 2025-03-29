@@ -124,6 +124,7 @@ export class ProductService {
         price: updateProductDto.price,
         stock: updateProductDto.stock,
         discount: updateProductDto.discount,
+        dimensions: updateProductDto.dimensions || [],
         discountEndDate: updateProductDto.discountEndDate,
         categories: updateProductDto.categories,
         tags: updateProductDto.tags,
