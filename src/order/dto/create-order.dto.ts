@@ -7,6 +7,9 @@ import {
   IsString,
   ValidateNested,
   IsIn,
+  IsEmail,
+  IsPhoneNumber,
+  Min,
 } from 'class-validator';
 
 // Define the DTO for items in the order
@@ -17,17 +20,73 @@ class OrderItemDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(1)
   quantity: number;
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   price: number;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(0)
+  subtotal: number;
+}
+
+// Define the DTO for delivery information
+class DeliveryDto {
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @IsString()
+  @IsNotEmpty()
+  city: string;
+
+  @IsString()
+  @IsNotEmpty()
+  state: string;
+
+  @IsString()
+  @IsNotEmpty()
+  postalCode: string;
+
+  @IsString()
+  @IsNotEmpty()
+  country: string;
+
+  @IsPhoneNumber()
+  @IsNotEmpty()
+  phone: string;
+}
+
+// Define the DTO for payment information
+class PaymentDto {
+  @IsString()
+  @IsIn(['cash', 'card', 'wallet'])
+  @IsNotEmpty()
+  method: string;
+
+  @IsString()
+  @IsIn(['pending', 'completed', 'failed'])
+  @IsNotEmpty()
+  status: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(0)
+  amount: number;
 }
 
 export class CreateOrderDto {
   @IsString()
   @IsOptional()
-  userId?: string; // Optional, as it may not always be provided
+  userId?: string;
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -38,19 +97,48 @@ export class CreateOrderDto {
   @IsNotEmpty()
   customerName: string;
 
-  @IsString()
+  @IsEmail()
   @IsNotEmpty()
-  deliveryAddress: string;
+  customerEmail: string;
+
+  @IsPhoneNumber()
+  @IsNotEmpty()
+  customerPhone: string;
+
+  @ValidateNested()
+  @Type(() => DeliveryDto)
+  delivery: DeliveryDto;
+
+  @ValidateNested()
+  @Type(() => PaymentDto)
+  payment: PaymentDto;
+
+  @IsString()
+  @IsIn(['delivery', 'pickup'])
+  @IsNotEmpty()
+  pickupMethod: string;
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
+  subtotal: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(0)
+  tax: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(0)
+  shippingCost: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(0)
   totalAmount: number;
 
   @IsString()
-  @IsIn(['delivery', 'pickup']) // Restrict to valid values
-  pickupMethod: string;
-
-  @IsString()
   @IsOptional()
-  notes?: string; // Optional field
+  notes?: string;
 }
