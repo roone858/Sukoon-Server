@@ -55,10 +55,10 @@ export class AuthService {
     const token = await this.generateToken(newUser._id.toString());
 
     // Send verification email
-    // await this.mailService.sendVerificationEmail(
-    //   createUserDto.email,
-    //   token.access_token,
-    // );
+    await this.mailService.sendVerificationEmail(
+      createUserDto.email,
+      token.access_token,
+    );
 
     return { access_token: token.access_token, user: newUser };
   }

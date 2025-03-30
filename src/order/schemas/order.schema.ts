@@ -1,5 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { User } from 'src/users/schemas/user.schema';
 
 // Define the type for OrderDocument
 export type OrderDocument = Order & Document;
@@ -22,18 +23,6 @@ interface Payment {
   paidAt?: Date;
 }
 
-// Define the Delivery interface
-interface Delivery {
-  address: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  phone: string;
-  estimatedDeliveryTime?: Date;
-  actualDeliveryTime?: Date;
-}
-
 @Schema({
   timestamps: true,
   toJSON: { virtuals: true },
@@ -41,7 +30,7 @@ interface Delivery {
 })
 export class Order {
   @Prop({ type: Types.ObjectId, ref: 'User', required: false })
-  userId?: Types.ObjectId;
+  userId?: User;
 
   @Prop({ required: true, unique: true })
   orderNumber: string;
@@ -77,18 +66,23 @@ export class Order {
 
   @Prop({
     type: {
-      address: { type: String, required: true },
-      city: { type: String, required: true },
-      state: { type: String, required: true },
-      postalCode: { type: String, required: true },
-      country: { type: String, required: true },
-      phone: { type: String, required: true },
-      estimatedDeliveryTime: Date,
-      actualDeliveryTime: Date,
+      address: String,
+      city: String,
+      state: String,
+      postalCode: String,
+      country: String,
+      phone: String,
     },
-    required: true,
+    required: false,
   })
-  delivery: Delivery;
+  delivery?: {
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    phone: string;
+  };
 
   @Prop({ required: true, min: 0 })
   subtotal: number;
@@ -136,7 +130,7 @@ export class Order {
   })
   status: string;
 
-  @Prop({ default: 'delivery', enum: ['delivery', 'pickup'] })
+  @Prop({ required: true, enum: ['delivery', 'pickup'] })
   pickupMethod: string;
 
   @Prop({ required: false })

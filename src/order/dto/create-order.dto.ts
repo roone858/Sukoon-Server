@@ -10,6 +10,7 @@ import {
   IsEmail,
   IsPhoneNumber,
   Min,
+  ValidateIf,
 } from 'class-validator';
 
 // Define the DTO for items in the order
@@ -89,6 +90,7 @@ export class CreateOrderDto {
   userId?: string;
 
   @IsArray()
+  @IsNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
   items: OrderItemDto[];
@@ -105,6 +107,7 @@ export class CreateOrderDto {
   @IsNotEmpty()
   customerPhone: string;
 
+  @ValidateIf((o) => o.pickupMethod === 'delivery')
   @ValidateNested()
   @Type(() => DeliveryDto)
   delivery: DeliveryDto;
