@@ -1,35 +1,39 @@
+import { Type } from 'class-transformer';
 import {
-  IsNotEmpty,
   IsArray,
-  IsNumber,
-  IsString,
   IsOptional,
+  ValidateNested,
+  IsNumber,
+  Min,
+  Max,
+  IsMongoId,
+  IsString,
 } from 'class-validator';
 
 class UpdateCartItemDto {
-  @IsString()
-  @IsNotEmpty()
-  productId: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  quantity: number;
-
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  price: number;
-
-  @IsString()
   @IsOptional()
-  image?: string;
+  @IsMongoId()
+  productId?: string;
+
+  @IsOptional()
+  @IsString()
+  dimensionId?: string; // معرف البعد (إن وجد)
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1, { message: 'Quantity cannot be less than 1' })
+  @Max(999, { message: 'Quantity cannot exceed 999' })
+  quantity?: number;
 }
 
 export class UpdateCartDto {
+  @IsOptional()
+  @IsMongoId()
+  userId?: string;
+
+  @IsOptional()
   @IsArray()
-  @IsNotEmpty()
-  items: UpdateCartItemDto[];
+  @ValidateNested({ each: true })
+  @Type(() => UpdateCartItemDto)
+  items?: UpdateCartItemDto[];
 }

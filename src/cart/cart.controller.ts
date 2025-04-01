@@ -20,8 +20,8 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Post()
-  createOrUpdate(@Body() createCartDto: CreateCartDto) {
-    return this.cartService.createOrUpdateCart(createCartDto);
+  createOrUpdate(@Body() createCartDto: CreateCartDto, @Req() req: any) {
+    return this.cartService.createOrUpdateCart(createCartDto, req.user._id);
   }
 
   @Get()

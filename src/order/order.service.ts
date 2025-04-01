@@ -50,6 +50,11 @@ export class OrderService {
     return this.orderModel.find().exec();
   }
 
+  async getOrdersByUserId(userId: string): Promise<Order[]> {
+    const orders = await this.orderModel.find({ userId: userId }).exec();
+    return orders;
+  }
+
   async getOrderById(id: string): Promise<Order> {
     const order = await this.orderModel.findById(id).exec();
     if (!order) throw new NotFoundException('Order not found');

@@ -57,7 +57,7 @@ export class Product extends Document {
         isAvailable: { type: Boolean, default: true },
       },
     ],
-    _id: false,
+    _id: true,
   })
   dimensions: {
     size: {

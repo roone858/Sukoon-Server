@@ -1,20 +1,35 @@
-import { IsNotEmpty, IsArray, IsNumber, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsNotEmpty,
+  ValidateNested,
+  IsNumber,
+  Min,
+  Max,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 class CartItemDto {
-  @IsString()
   @IsNotEmpty()
   productId: string;
 
+  @IsOptional()
+  @IsString()
+  dimensionId?: string; // معرف البعد (إن وجد)
+
   @IsNumber()
+  @Min(1, { message: 'Quantity cannot be less than 1' })
+  @Max(999, { message: 'Quantity cannot exceed 999' })
   quantity: number;
 }
 
 export class CreateCartDto {
-  @IsString()
-  @IsNotEmpty()
-  userId: string;
+  @IsOptional()
+  userId?: string;
 
   @IsArray()
-  @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => CartItemDto)
   items: CartItemDto[];
 }
