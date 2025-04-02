@@ -63,6 +63,12 @@ export class AuthService {
     return { access_token: token.access_token, user: newUser };
   }
 
+  /** 📩 Resend Verification Email */
+  async resendVerificationEmail(email: string): Promise<void> {
+    const token = await this.generateToken(email);
+    await this.mailService.sendVerificationEmail(email, token.access_token);
+  }
+
   /** 📩 Confirm Email */
   async confirmEmail(token: string): Promise<{ status: string; url: string }> {
     const decoded = (await this.jwtService.decode(token)) as {

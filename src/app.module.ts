@@ -10,6 +10,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
 import { ReviewModule } from './review/review.module';
+import { WishlistModule } from './wishlist/wishlist.module';
 import { v2 as cloudinary } from 'cloudinary';
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { v2 as cloudinary } from 'cloudinary';
     CartModule,
     OrderModule,
     ReviewModule,
+    WishlistModule,
   ],
   controllers: [AppController],
 

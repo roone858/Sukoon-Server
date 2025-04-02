@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@mail/*": ["src/mail/*"]
+    },
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,

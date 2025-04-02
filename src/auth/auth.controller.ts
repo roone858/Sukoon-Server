@@ -63,6 +63,11 @@ export class AuthController {
     const isExists = await this.authService.isEmailExists(body.email);
     return { isExists };
   }
+  @Post('resend-verification-email')
+  async resendVerificationEmail(@Body() body: { email: string }) {
+    await this.authService.resendVerificationEmail(body.email);
+    return { message: 'Verification email sent successfully' };
+  }
 
   @Get('google')
   @UseGuards(AuthGuard('google'))

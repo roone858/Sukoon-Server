@@ -3,7 +3,11 @@ import { Document, Types } from 'mongoose';
 import { User } from 'src/users/schemas/user.schema';
 
 // Define the type for OrderDocument
-export type OrderDocument = Order & Document;
+export type OrderDocument = Order &
+  Document & {
+    createdAt: Date;
+    updatedAt: Date;
+  };
 
 // Define the Item interface for better type safety
 interface Item {

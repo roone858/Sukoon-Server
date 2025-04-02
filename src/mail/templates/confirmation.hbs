@@ -1,32 +1,31 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html dir="rtl">
+<head>
     <meta charset='utf-8' />
     <meta http-equiv='x-ua-compatible' content='ie=edge' />
-    <title>Welcome to Sukoon - Verify Your Email</title>
+    <title>مرحبًا بكم في سكون - تأكيد البريد الإلكتروني</title>
     <meta name='viewport' content='width=device-width, initial-scale=1' />
     <style type='text/css'>
       @media screen {
         @font-face {
-          font-family: 'Source Sans Pro';
+          font-family: 'Tajawal';
           font-style: normal;
           font-weight: 400;
-          src: local('Source Sans Pro Regular'), local('SourceSansPro-Regular'),
-      url(https://fonts.gstatic.com/s/sourcesanspro/v10/ODelI1aHBYDBqgeIAH2zlBM0YzuT7MdOe03otPbuUS0.woff)
-            format('woff');
+          src: local('Tajawal'), local('Tajawal-Regular'),
+               url(https://fonts.googleapis.com/css2?family=Tajawal:wght@400&display=swap) format('woff2');
         }
         @font-face {
-          font-family: 'Source Sans Pro';
+          font-family: 'Tajawal';
           font-style: normal;
           font-weight: 700;
-          src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold'),
-      url(https://fonts.gstatic.com/s/sourcesanspro/v10/toadOcfmlt9b38dHJxOBGFkQc6VGVFSmCnC_l7QZG60.woff)
-            format('woff');
+          src: local('Tajawal Bold'), local('Tajawal-Bold'),
+               url(https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap) format('woff2');
         }
       }
       body, table, td, a {
         -ms-text-size-adjust: 100%;
         -webkit-text-size-adjust: 100%;
+        font-family: 'Tajawal', sans-serif;
       }
       table, td {
         mso-table-rspace: 0pt;
@@ -48,7 +47,7 @@
         height: 100% !important;
         padding: 0 !important;
         margin: 0 !important;
-        font-family: 'Source Sans Pro', sans-serif;
+        text-align: right;
       }
       table {
         border-collapse: collapse !important;
@@ -81,11 +80,12 @@
       .button {
         display: inline-block;
         padding: 12px 24px;
-        background-color: #1a82e2;
+        background-color: #4CAF50;
         color: #ffffff !important;
         text-decoration: none;
         border-radius: 4px;
         margin: 20px 0;
+        font-weight: bold;
       }
       .footer {
         text-align: center;
@@ -95,42 +95,45 @@
         color: #666666;
       }
     </style>
-  </head>
-  <body style='background-color: #f8f9fa;'>
+</head>
+<body style='background-color: #f8f9fa;'>
     <div class='container'>
       <div class='header'>
-        <h1 style='color: #333333; margin: 0;'>Welcome to Sukoon!</h1>
-    </div>
+        <h1 style='color: #333333; margin: 0;'>مرحبًا بكم في سكون!</h1>
+      </div>
       
       <div class='content'>
-        <p style='color: #333333; font-size: 16px; line-height: 1.5;'>
-          Thank you for signing up with Sukoon. To complete your registration and verify your email address, please click the button below:
+        <p style='color: #333333; font-size: 16px; line-height: 1.8;'>
+          شكرًا لتسجيلكم في سكون. لإكمال عملية التسجيل وتأكيد عنوان بريدكم الإلكتروني، يرجى النقر على الزر أدناه:
         </p>
         
         <div style='text-align: center;'>
           <a href='{{clientUrl}}/verify-email?token={{token}}' class='button'>
-            Verify Email Address
+            تأكيد البريد الإلكتروني
           </a>
         </div>
         
-        <p style='color: #666666; font-size: 14px; line-height: 1.5;'>
-          If the button above doesn't work, you can copy and paste this link into your browser:
+        <p style='color: #666666; font-size: 14px; line-height: 1.8;'>
+          إذا لم يعمل الزر أعلاه، يمكنكم نسخ ولصق الرابط التالي في متصفحكم:
           <br>
           <a href='{{clientUrl}}/verify-email?token={{token}}' style='color: #1a82e2; word-break: break-all;'>
             {{clientUrl}}/verify-email?token={{token}}
           </a>
         </p>
         
-        <p style='color: #666666; font-size: 14px; line-height: 1.5;'>
-          This verification link will expire in 24 hours. If you didn't create an account with Sukoon, you can safely ignore this email.
+        <p style='color: #666666; font-size: 14px; line-height: 1.8;'>
+          ستنتهي صلاحية رابط التأكيد هذا خلال 24 ساعة. إذا لم تقوموا بإنشاء حساب في سكون، يمكنكم تجاهل هذا البريد بأمان.
         </p>
       </div>
       
       <div class='footer'>
         <p style='margin: 0;'>
-          This is an automated message, please do not reply to this email.
+          هذه رسالة آلية، يرجى عدم الرد على هذا البريد الإلكتروني.
+        </p>
+        <p style='margin: 10px 0 0;'>
+          © 2025 سكون. جميع الحقوق محفوظة.
         </p>
       </div>
     </div>
-  </body>
+</body>
 </html>

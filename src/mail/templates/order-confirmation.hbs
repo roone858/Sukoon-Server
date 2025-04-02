@@ -1,0 +1,188 @@
+<html dir='rtl' lang='ar'>
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv='x-ua-compatible' content='ie=edge' />
+    <title>تفاصيل طلبك #{{orderNumber}}</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <style type='text/css'>
+      @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+
+      body {
+        font-family: 'Tajawal', sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+        color: #333;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+      }
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .header img {
+        max-height: 60px;
+      }
+      .order-info {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .order-info p {
+        margin: 5px 0;
+      }
+      .order-details {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      .order-details th,
+      .order-details td {
+        padding: 12px 15px;
+        text-align: right;
+        border-bottom: 1px solid #ddd;
+      }
+      .order-details th {
+        background-color: #f2f2f2;
+        font-weight: 700;
+      }
+      .total-row {
+        font-weight: bold;
+        background-color: #f2f2f2;
+      }
+      .status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: bold;
+        margin: 5px 0;
+      }
+      .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+      .status-confirmed {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .status-shipped {
+        background-color: #cce5ff;
+        color: #004085;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #777;
+        border-top: 1px solid #eee;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white !important;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <h1 style='color: #333; margin: 0;'>شكرًا لطلبك من سكون</h1>
+        <p style='color: #666;'>رقم الطلب: #{{orderNumber}}</p>
+      </div>
+
+      <div class='order-info'>
+        <h2 style='margin-top: 0;'>معلومات الطلب</h2>
+        <p><strong>تاريخ الطلب:</strong> {{createdAt}}</p>
+        <p><strong>حالة الطلب:</strong>
+          <span class='status status-{{status}}'>{{status}}</span></p>
+        <p><strong>طريقة الاستلام:</strong> {{pickupMethod}}</p>
+        {{#if delivery}}
+          <p><strong>عنوان التوصيل:</strong>
+            {{delivery.address.street}}،
+            {{delivery.address.city}}،
+            {{delivery.address.state}}</p>
+        {{/if}}
+      </div>
+
+      <h2>تفاصيل الطلب</h2>
+      <table class='order-details'>
+        <thead>
+          <tr>
+            <th>المنتج</th>
+            <th>الكمية</th>
+            <th>السعر</th>
+            <th>المجموع</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each items}}
+            <tr>
+              <td>{{name}}</td>
+              <td>{{quantity}}</td>
+              <td>{{price}} ر.س</td>
+              <td>{{subtotal}} ر.س</td>
+            </tr>
+          {{/each}}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan='3' style='text-align: left;'>المجموع الجزئي:</td>
+            <td>{{subtotal}} ر.س</td>
+          </tr>
+          <tr>
+            <td colspan='3' style='text-align: left;'>الضريبة:</td>
+            <td>{{tax}} ر.س</td>
+          </tr>
+          <tr>
+            <td colspan='3' style='text-align: left;'>تكلفة الشحن:</td>
+            <td>{{shippingCost}} ر.س</td>
+          </tr>
+          <tr class='total-row'>
+            <td colspan='3' style='text-align: left;'>المجموع الكلي:</td>
+            <td>{{totalAmount}} ر.س</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class='order-info'>
+        <h2 style='margin-top: 0;'>معلومات الدفع</h2>
+        <p><strong>طريقة الدفع:</strong> {{payment.method}}</p>
+        <p><strong>حالة الدفع:</strong> {{payment.status}}</p>
+        {{#if payment.transactionId}}
+          <p><strong>رقم المعاملة:</strong> {{payment.transactionId}}</p>
+        {{/if}}
+        <p><strong>المبلغ المدفوع:</strong> {{payment.amount}} ر.س</p>
+      </div>
+
+      {{#if notes}}
+        <div class='order-info'>
+          <h2 style='margin-top: 0;'>ملاحظات إضافية</h2>
+          <p>{{notes}}</p>
+        </div>
+      {{/if}}
+
+      <div style='text-align: center; margin: 20px 0;'>
+        <a href='{{clientUrl}}/orders/{{orderNumber}}' class='button'>متابعة
+          حالة الطلب</a>
+      </div>
+
+      <div class='footer'>
+        <p>لأي استفسارات، لا تتردد في التواصل معنا عبر البريد الإلكتروني أو
+          الهاتف.</p>
+        <p>© 2025 سكون. جميع الحقوق محفوظة.</p>
+      </div>
+    </div>
+  </body>
+</html>

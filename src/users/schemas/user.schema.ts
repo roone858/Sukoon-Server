@@ -26,11 +26,15 @@ export class User {
 
   @Prop({ required: false, default: 'user', enum: ['user', 'admin'] })
   role: 'user' | 'admin';
+
   @Prop()
   googleId: string;
 
   @Prop()
   facebookId: string;
+
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Product' }] })
+  wishlist: MongooseSchema.Types.ObjectId[];
 }
 
 export type UserDocument = User & Document;

@@ -21,8 +21,8 @@ dotenv.config();
         from: '"No Reply" <noreply@example.com>',
       },
       template: {
-        dir: join(__dirname, 'templates'),
-        adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
+        dir: join(__dirname, '/templates'),
+        adapter: new HandlebarsAdapter(),
         options: {
           strict: true,
         },

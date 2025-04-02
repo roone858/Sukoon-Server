@@ -4,11 +4,13 @@ import { Model } from 'mongoose';
 import { Order, OrderDocument } from './schemas/order.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { MailService } from '@mail/mail.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
+    private readonly mailService: MailService,
   ) {}
 
   private async generateOrderNumber(): Promise<string> {
@@ -43,7 +45,9 @@ export class OrderService {
         },
       ],
     });
-    return order.save();
+    const savedOrder = await order.save();
+    await this.mailService.sendOrderConfirmationEmail(savedOrder);
+    return savedOrder;
   }
 
   async getAllOrders(): Promise<Order[]> {
