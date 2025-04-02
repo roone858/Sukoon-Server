@@ -1,6 +1,5 @@
 // whatsapp/whatsapp.service.ts
 import { Injectable } from '@nestjs/common';
-import { AxiosResponse } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import { Observable } from 'rxjs';
 import { firstValueFrom } from 'rxjs';
@@ -12,7 +11,7 @@ export class WhatsAppService {
     'https://graph.facebook.com/v18.0/YOUR_PHONE_NUMBER_ID/messages';
   private readonly accessToken = 'YOUR_WHATSAPP_ACCESS_TOKEN';
 
-  sendMessage(phoneNumber: string, message: string): Observable<AxiosResponse> {
+  sendMessage(phoneNumber: string, message: string): Observable<any> {
     const payload = {
       messaging_product: 'whatsapp',
       recipient_type: 'individual',
