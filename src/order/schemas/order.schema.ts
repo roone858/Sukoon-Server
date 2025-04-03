@@ -157,7 +157,7 @@ export class Order {
 export const OrderSchema = SchemaFactory.createForClass(Order);
 
 // Add indexes for better query performance
-OrderSchema.index({ orderNumber: 1 }, { unique: true });
+OrderSchema.index({ orderNumber: 1 });
 OrderSchema.index({ userId: 1 });
 OrderSchema.index({ status: 1 });
 OrderSchema.index({ createdAt: -1 });
