@@ -38,6 +38,11 @@ export class OrderController {
     return this.orderService.getOrdersByUserId(req.user._id.toString());
   }
 
+  @Get(':orderNumber')
+  findByOrderNumber(@Param('orderNumber') orderNumber: string) {
+    return this.orderService.findByOrderNumber(orderNumber);
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   async findOne(@Param('id') id: string, @User() user: any) {
