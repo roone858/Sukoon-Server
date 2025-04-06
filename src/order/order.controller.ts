@@ -38,22 +38,21 @@ export class OrderController {
     return this.orderService.getOrdersByUserId(req.user._id.toString());
   }
 
-  @Get(':orderNumber')
+  @Get('/number/:orderNumber')
   findByOrderNumber(@Param('orderNumber') orderNumber: string) {
     return this.orderService.findByOrderNumber(orderNumber);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  async findOne(@Param('id') id: string, @User() user: any) {
+  async findOne(@Param('id') id: string) {
     const order = await this.orderService.getOrderById(id);
-    // Allow access if user is admin or if the order belongs to the user
-    if (
-      user.role !== 'admin' &&
-      order.userId?.toString() !== user._id.toString()
-    ) {
-      throw new ForbiddenException('You can only access your own orders');
-    }
+    // // Allow access if user is admin or if the order belongs to the user
+    // if (
+    //   user.role !== 'admin' &&
+    //   order.userId?.toString() !== user._id.toString()
+    // ) {
+    //   throw new ForbiddenException('You can only access your own orders');
+    // }
     return order;
   }
 
