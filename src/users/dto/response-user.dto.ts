@@ -3,6 +3,7 @@ export class ResponseUserDto {
   username: string;
   email: string;
   name: string;
+  phone?: string;
   profilePicture: string;
   emailConfirmed: boolean;
   role: 'user' | 'admin';

@@ -1,36 +1,55 @@
-import { Injectable } from '@nestjs/common';
-import { v2 as cloudinary } from 'cloudinary';
-import { CloudinaryUploadResult } from './cloudinary.types';
+import {
+  Injectable,
+  Inject,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { Readable } from 'stream';
+import { CloudinaryResponse } from './cloudinary-response';
 
 @Injectable()
 export class CloudinaryService {
-  constructor() {
-    cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
-    });
+  constructor(@Inject('CLOUDINARY') private readonly cloudinary: any) {}
+
+  async uploadFile(file: Express.Multer.File): Promise<CloudinaryResponse> {
+    try {
+      if (!this.cloudinary?.uploader) {
+        throw new Error('Cloudinary uploader is not configured');
+      }
+      return await new Promise((resolve, reject) => {
+        const uploadStream = this.cloudinary.uploader.upload_stream(
+          { resource_type: 'auto' },
+          (error, result) => {
+            if (error) {
+              return reject(
+                new InternalServerErrorException(
+                  `Cloudinary Upload Error: ${error.message}`,
+                ),
+              );
+            }
+            resolve(result);
+          },
+        );
+
+        Readable.from(file.buffer).pipe(uploadStream);
+      });
+    } catch (err) {
+      throw new InternalServerErrorException(`Upload failed: ${err.message}`);
+    }
   }
 
-  async uploadImage(buffer: Buffer): Promise<CloudinaryUploadResult> {
-    return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { resource_type: 'auto' },
-        (error, result) => {
-          if (error) return reject(error);
-          if (!result)
-            return reject(new Error('Upload failed: No result returned'));
-          resolve({
-            public_id: result.public_id,
-            secure_url: result.secure_url,
-            width: result.width,
-            height: result.height,
-            format: result.format,
-            resource_type: result.resource_type,
-          });
-        },
+  async deleteFile(publicId: string): Promise<any> {
+    try {
+      const result = await this.cloudinary.uploader.destroy(publicId);
+      if (result.result !== 'ok' && result.result !== 'not found') {
+        throw new InternalServerErrorException(
+          `Failed to delete image: ${result.result}`,
+        );
+      }
+      return result;
+    } catch (err) {
+      throw new InternalServerErrorException(
+        `Cloudinary Delete Error: ${err.message}`,
       );
-      uploadStream.end(buffer);
-    });
+    }
   }
 }

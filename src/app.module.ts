@@ -11,7 +11,7 @@ import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
 import { ReviewModule } from './review/review.module';
 import { WishlistModule } from './wishlist/wishlist.module';
-import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,19 +26,10 @@ import { v2 as cloudinary } from 'cloudinary';
     OrderModule,
     ReviewModule,
     WishlistModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
 
-  providers: [
-    AppService,
-    {
-      provide: 'CLOUDINARY',
-      useValue: cloudinary.config({
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET,
-      }),
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

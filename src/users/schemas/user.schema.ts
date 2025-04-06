@@ -21,6 +21,9 @@ export class User {
   @Prop()
   profilePicture: string;
 
+  @Prop({ unique: true })
+  phone?: string;
+
   @Prop({ required: false, default: false })
   emailConfirmed: boolean;
 

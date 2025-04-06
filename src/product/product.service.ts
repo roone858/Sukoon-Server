@@ -9,8 +9,8 @@ import { Model } from 'mongoose';
 import { Product, ProductDocument } from './schemas/product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { v2 as cloudinary } from 'cloudinary';
 import { ProductResponseDto } from './dto/response.product.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 interface CloudinaryUploadResult {
   secure_url: string;
@@ -21,13 +21,8 @@ interface CloudinaryUploadResult {
 export class ProductService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
-  ) {
-    cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
-    });
-  }
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   async findAll(): Promise<ProductResponseDto[]> {
     const products = await this.productModel.find().lean().exec();
@@ -63,7 +58,7 @@ export class ProductService {
   ): Promise<ProductResponseDto> {
     try {
       const uploadResults = await Promise.all(
-        files.map((file) => this.uploadToCloudinary(file.buffer)),
+        files.map((file) => this.cloudinaryService.uploadFile(file)),
       );
 
       const createdProduct = await this.productModel.create({
@@ -107,13 +102,17 @@ export class ProductService {
     let newImageResults: CloudinaryUploadResult[] = [];
     if (newFiles?.length) {
       newImageResults = await Promise.all(
-        newFiles.map((file) => this.uploadToCloudinary(file.buffer)),
+        newFiles.map((file) => this.cloudinaryService.uploadFile(file)),
       );
     }
 
     // Handle image deletions
     if (updateProductDto.imagesToDelete?.length) {
-      await this.deleteImagesFromCloudinary(updateProductDto.imagesToDelete);
+      await Promise.all(
+        updateProductDto.imagesToDelete.map((publicId) =>
+          this.cloudinaryService.deleteFile(publicId),
+        ),
+      );
     }
 
     // Prepare the update object
@@ -170,39 +169,13 @@ export class ProductService {
     }
 
     if (product.images?.length) {
-      await this.deleteImagesFromCloudinary(
-        product.images.map((img) => img.public_id),
+      await Promise.all(
+        product.images.map((img) =>
+          this.cloudinaryService.deleteFile(img.public_id),
+        ),
       );
     }
 
     return { success: true };
-  }
-
-  private async uploadToCloudinary(
-    buffer: Buffer,
-  ): Promise<CloudinaryUploadResult> {
-    return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { resource_type: 'auto' },
-        (error, result) => {
-          if (error) reject(error);
-          else if (!result) reject(new Error('Upload failed'));
-          else
-            resolve({
-              secure_url: result.secure_url,
-              public_id: result.public_id,
-            });
-        },
-      );
-      uploadStream.end(buffer);
-    });
-  }
-
-  private async deleteImagesFromCloudinary(publicIds: string[]): Promise<void> {
-    await Promise.all(
-      publicIds.map((publicId) =>
-        cloudinary.uploader.destroy(publicId).catch(console.error),
-      ),
-    );
   }
 }

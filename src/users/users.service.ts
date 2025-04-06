@@ -8,11 +8,13 @@ import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateGoogleUserDto } from 'src/auth/strategies/dto/create-google-user.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   /*** 🔍 FIND METHODS ***/
@@ -133,16 +135,10 @@ export class UsersService {
     );
   }
 
-  async updateProfileImage(userId: string, filename: string): Promise<any> {
-    return this.userModel.findByIdAndUpdate(
-      userId,
-      {
-        $set: {
-          profilePicture:
-            process.env.SERVER_BASE_URL + '/users/profile-picture/' + filename,
-        },
-      }, // تحديث `photo` فقط مع الاحتفاظ بباقي الحقول
-      { new: true },
-    );
+  async updateProfileImage(image: Express.Multer.File): Promise<any> {
+    const res = await this.cloudinaryService.uploadFile(image);
+    console.log(res);
+    // اسم الملف بعد التحميل
+    return res.url;
   }
 }

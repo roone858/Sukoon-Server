@@ -12,16 +12,15 @@ import {
   Res,
   Param,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AdminGuard } from './guards/admin.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { join } from 'path';
 import { Response } from 'express';
-import * as path from 'path';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
@@ -41,12 +40,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Patch()
-  @UseGuards(AuthGuard('jwt'))
-  update(@Request() req: any, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser(req.user._id, updateUserDto);
-  }
-  @Patch(':userId')
+  @Patch('/:userId')
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   updateByAdmin(
     @Request() req: any,
@@ -54,6 +48,31 @@ export class UsersController {
     @Param('userId') userId: string,
   ) {
     return this.usersService.updateUser(userId, updateUserDto);
+  }
+
+  @Patch()
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('profilePicture')) // اسم الفيلد من الـ frontend
+  async updateProfile(
+    @UploadedFile() profilePicture: Express.Multer.File,
+    @Request() req: any,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    console.log(updateUserDto);
+
+    // Ensure req.user._id exists and is valid
+    if (!req.user?._id) {
+      throw new BadRequestException('User ID not found in request');
+    }
+
+    if (profilePicture) {
+      const imageUrl =
+        await this.usersService.updateProfileImage(profilePicture);
+      console.log(imageUrl);
+      updateUserDto.profilePicture = imageUrl;
+    }
+
+    return this.usersService.updateUser(req.user._id, updateUserDto);
   }
 
   @UseGuards(AuthGuard('jwt'), AdminGuard)
@@ -84,35 +103,6 @@ export class UsersController {
     }
   }
 
-  @Post('profile-picture')
-  @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './images/profiles pictures', // Specify the directory where files will be stored
-        filename: (req, file, cb) => {
-          const userId = (req as any).user._id; // Assuming you have a user object in the request
-          const fileExtension = path.extname(file.originalname);
-          const fileName = userId + Date.now() + fileExtension;
-          cb(null, fileName);
-        },
-      }),
-    }),
-  )
-  async uploadProfilePicture(
-    @UploadedFile() file,
-    @Body('updatedUser') updatedUser: string,
-    @Req() req,
-  ) {
-    const { _id } = req.user;
-    const userData = JSON.parse(updatedUser);
-    await this.usersService.updateUser(_id, userData);
-    const userProfile = await this.usersService.updateProfileImage(
-      _id,
-      file.filename,
-    );
-    return userProfile;
-  }
   @Get('/profile-picture/:userPic')
   // @UseGuards(JwtAuthGuard)
   getProfilePicture(@Param('userPic') userPic: string, @Res() res: Response) {
