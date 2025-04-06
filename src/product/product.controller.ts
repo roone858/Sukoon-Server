@@ -35,6 +35,7 @@ export class ProductController {
     @UploadedFiles() files: Express.Multer.File[],
     @Body() createProductDto: CreateProductDto,
   ) {
+    console.log('عدى هنا');
     if (!files || files.length === 0) {
       throw new BadRequestException('At least one image is required');
     }
@@ -43,7 +44,6 @@ export class ProductController {
       console.log('transaction');
       createProductDto.dimensions = JSON.parse(createProductDto.dimensions);
     }
-    console.log(createProductDto);
     return this.productService.createWithImages(createProductDto, files);
   }
 

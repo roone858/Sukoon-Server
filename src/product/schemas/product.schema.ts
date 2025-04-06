@@ -24,17 +24,17 @@ export class Product extends Document {
   stock: number;
 
   @Prop({
+    required: false,
     type: Number,
-    default: 0,
     min: 0,
     max: 100,
-    set: (v: any) => parseFloat(v) || 0,
+    set: (v: any) => parseFloat(v),
   })
   discount: number;
 
   @Prop({
     type: Date,
-    default: null,
+    required: false,
   })
   discountEndDate?: Date;
 
