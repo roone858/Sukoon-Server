@@ -63,6 +63,7 @@ export class CreateProductDto {
   @MaxLength(30, { each: true })
   categories: string[];
 
+  @IsOptional()
   @IsArray()
   @Type(() => DimensionDto)
   dimensions: DimensionDto[];

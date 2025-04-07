@@ -59,7 +59,7 @@ export class Product extends Document {
     ],
     _id: true,
   })
-  dimensions: {
+  dimensions?: {
     size: {
       width: number;
       height: number;
