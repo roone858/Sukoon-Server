@@ -78,9 +78,21 @@ export class CategoriesService {
   async update(
     id: string,
     updateCategoryDto: UpdateCategoryDto,
+    file: Express.Multer.File,
   ): Promise<Category> {
+    let imageUrl = updateCategoryDto.imageUrl;
+    if (file) {
+      if (imageUrl)
+        await this.cloudinaryService.deleteFileWithUrl(
+          updateCategoryDto.imageUrl,
+        );
+      const result = await this.cloudinaryService.uploadFile(file);
+      imageUrl = result.url;
+      updateCategoryDto.imageUrl = imageUrl;
+    }
+    const updateData = { ...updateCategoryDto };
     const existingCategory = await this.categoryModel
-      .findByIdAndUpdate(id, updateCategoryDto, { new: true })
+      .findByIdAndUpdate(id, updateData, { new: true })
       .exec();
 
     if (!existingCategory) {
