@@ -55,7 +55,18 @@ export class ProductController {
     @UploadedFiles() newFiles: Express.Multer.File[],
     @Body() updateProductDto: UpdateProductDto,
   ) {
-    return this.productService.updateWithImages(id, updateProductDto, newFiles);
+    console.log(updateProductDto);
+    try {
+      const updated = this.productService.updateWithImages(
+        id,
+        updateProductDto,
+        newFiles,
+      );
+      return updated;
+    } catch (e) {
+      console.log(e);
+      return new BadRequestException('Error updating product');
+    }
   }
 
   @Delete(':id')

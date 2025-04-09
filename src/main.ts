@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MongoExceptionFilter } from './common/exceptions/mongo-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from './common/exceptions/all-exceptions-filter';
+import { ValidationExceptionFilter } from './common/exceptions/validation-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -19,8 +19,10 @@ async function bootstrap() {
       whitelist: true, // إزالة أي خصائص غير موجودة في الـ DTO
     }),
   );
-  app.useGlobalFilters(new MongoExceptionFilter());
-  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalFilters(
+    new ValidationExceptionFilter(),
+    new MongoExceptionFilter(),
+  );
   const PORT = process.env.PORT || 3000; // تأكد من استخدام PORT
   await app.listen(PORT);
   console.log(`🚀 Server is running on port ${PORT}`);

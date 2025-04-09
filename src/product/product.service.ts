@@ -98,26 +98,41 @@ export class ProductService {
       throw new NotFoundException('Product not found');
     }
 
-    // Handle new image uploads
-    let newImageResults: CloudinaryUploadResult[] = [];
-    if (newFiles?.length) {
-      newImageResults = await Promise.all(
-        newFiles.map((file) => this.cloudinaryService.uploadFile(file)),
-      );
-    }
+    // Start transaction for atomic operations
+    const session = await this.productModel.startSession();
+    session.startTransaction();
 
-    // Handle image deletions
-    if (updateProductDto.imagesToDelete?.length) {
-      await Promise.all(
-        updateProductDto.imagesToDelete.map((publicId) =>
-          this.cloudinaryService.deleteFile(publicId),
-        ),
-      );
-    }
+    try {
+      // Handle image deletions first
+      if (updateProductDto.imagesToDelete?.length) {
+        // Verify images exist before deletion
+        const imagesExist = updateProductDto.imagesToDelete.every((publicId) =>
+          product.images.some((img) => img.public_id === publicId),
+        );
 
-    // Prepare the update object
-    const update: any = {
-      $set: {
+        if (!imagesExist) {
+          throw new BadRequestException(
+            'One or more images to delete not found',
+          );
+        }
+
+        await Promise.all(
+          updateProductDto.imagesToDelete.map((publicId) =>
+            this.cloudinaryService.deleteFile(publicId),
+          ),
+        );
+      }
+
+      // Handle new image uploads
+      let newImageResults: CloudinaryUploadResult[] = [];
+      if (newFiles?.length) {
+        newImageResults = await Promise.all(
+          newFiles.map((file) => this.cloudinaryService.uploadFile(file)),
+        );
+      }
+
+      // Prepare the update object
+      const update: any = {
         name: updateProductDto.name,
         description: updateProductDto.description,
         price: updateProductDto.price,
@@ -127,40 +142,54 @@ export class ProductService {
         discountEndDate: updateProductDto.discountEndDate,
         categories: updateProductDto.categories,
         tags: updateProductDto.tags,
-      },
-    };
-
-    // Handle images array modifications
-    if (updateProductDto.imagesToDelete?.length) {
-      update.$pull = {
-        images: { public_id: { $in: updateProductDto.imagesToDelete } },
       };
+
+      // Handle images array modifications atomically
+      if (
+        updateProductDto.imagesToDelete?.length ||
+        newImageResults.length > 0
+      ) {
+        update.images = [...product.images];
+
+        // Remove deleted images
+        if (updateProductDto.imagesToDelete?.length) {
+          update.images = update.images.filter(
+            (img) => !updateProductDto.imagesToDelete.includes(img.public_id),
+          );
+        }
+
+        // Add new images
+        if (newImageResults.length > 0) {
+          update.images.push(
+            ...newImageResults.map((result) => ({
+              url: result.secure_url,
+              public_id: result.public_id,
+              altText: updateProductDto.name || product.name,
+            })),
+          );
+        }
+      }
+
+      // Perform the update
+      const updatedProduct = await this.productModel
+        .findByIdAndUpdate(id, update, { new: true, session })
+        .exec();
+
+      if (!updatedProduct) {
+        throw new NotFoundException('Product not found after update');
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return this.toProductResponseDto(
+        updatedProduct.toObject({ virtuals: true }),
+      );
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
     }
-
-    if (newImageResults.length > 0) {
-      update.$push = {
-        images: {
-          $each: newImageResults.map((result) => ({
-            url: result.secure_url,
-            public_id: result.public_id,
-            altText: updateProductDto.name || product.name,
-          })),
-        },
-      };
-    }
-
-    // Perform the update
-    const updatedProduct = await this.productModel
-      .findByIdAndUpdate(id, update, { new: true })
-      .exec();
-
-    if (!updatedProduct) {
-      throw new NotFoundException('Product not found after update');
-    }
-
-    return this.toProductResponseDto(
-      updatedProduct.toObject({ virtuals: true }),
-    );
   }
   async delete(id: string): Promise<{ success: boolean }> {
     const product = await this.productModel.findByIdAndDelete(id).exec();

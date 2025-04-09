@@ -55,7 +55,13 @@ export class UpdateProductDto {
   @IsNumber()
   @Min(0)
   @Max(100)
-  @Transform(({ value }) => parseFloat(value))
+  @Transform(({ value }) => {
+    // تحقق من القيمة أولاً، إذا كانت undefined أو null لا نقوم بالتحويل
+    if (value === undefined || value === null) {
+      return undefined;
+    }
+    return parseFloat(value); // تحويل القيمة إلى رقم
+  })
   discount?: number;
 
   @IsOptional()
