@@ -33,7 +33,6 @@ export class CartController {
   @Patch()
   updateCart(@Body() updateCartDto: UpdateCartDto, @Req() req: any) {
     const userId = req.user._id;
-
     return this.cartService.updateCart(userId, updateCartDto);
   }
 

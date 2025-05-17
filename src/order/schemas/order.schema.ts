@@ -13,6 +13,7 @@ export type OrderDocument = Order &
 interface Item {
   productId: string;
   quantity: number;
+  dimensionId?: string; // Optional dimension ID for products with dimensions
   price: number;
   name: string; // Added product name for better order history
   subtotal: number; // Added subtotal for each item
@@ -45,6 +46,7 @@ export class Order {
         productId: { type: String, required: true },
         quantity: { type: Number, required: true, min: 1 },
         price: { type: Number, required: true, min: 0 },
+        dimensionId: { type: String, required: false }, // Optional for products with dimensions
         name: { type: String, required: true },
         subtotal: { type: Number, required: true },
       },

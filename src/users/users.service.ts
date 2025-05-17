@@ -137,7 +137,6 @@ export class UsersService {
 
   async updateProfileImage(image: Express.Multer.File): Promise<any> {
     const res = await this.cloudinaryService.uploadFile(image);
-    console.log(res);
     // اسم الملف بعد التحميل
     return res.url;
   }

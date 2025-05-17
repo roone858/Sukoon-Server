@@ -13,7 +13,6 @@ export class ValidationExceptionFilter implements ExceptionFilter {
     const context = host.switchToHttp();
     const response = context.getResponse();
     const status = exception.getStatus();
-    console.log(exception);
     response.status(status).json({
       statusCode: status,
       message: 'Validation failed',

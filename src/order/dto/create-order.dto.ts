@@ -29,6 +29,9 @@ class OrderItemDto {
   @Min(0)
   price: number;
 
+  @IsOptional()
+  dimensionId?: string; // Optional for products with dimensions
+
   @IsString()
   @IsNotEmpty()
   name: string;

@@ -35,13 +35,10 @@ export class ProductController {
     @UploadedFiles() files: Express.Multer.File[],
     @Body() createProductDto: CreateProductDto,
   ) {
-    console.log('عدى هنا');
     if (!files || files.length === 0) {
       throw new BadRequestException('At least one image is required');
     }
-    console.log(createProductDto);
     if (typeof createProductDto.dimensions === 'string') {
-      console.log('transaction');
       createProductDto.dimensions = JSON.parse(createProductDto.dimensions);
     }
     return this.productService.createWithImages(createProductDto, files);
@@ -55,7 +52,6 @@ export class ProductController {
     @UploadedFiles() newFiles: Express.Multer.File[],
     @Body() updateProductDto: UpdateProductDto,
   ) {
-    console.log(updateProductDto);
     try {
       const updated = this.productService.updateWithImages(
         id,
@@ -64,7 +60,6 @@ export class ProductController {
       );
       return updated;
     } catch (e) {
-      console.log(e);
       return new BadRequestException('Error updating product');
     }
   }

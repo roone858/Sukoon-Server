@@ -58,8 +58,6 @@ export class UsersController {
     @Request() req: any,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    console.log(updateUserDto);
-
     // Ensure req.user._id exists and is valid
     if (!req.user?._id) {
       throw new BadRequestException('User ID not found in request');
@@ -68,7 +66,6 @@ export class UsersController {
     if (profilePicture) {
       const imageUrl =
         await this.usersService.updateProfileImage(profilePicture);
-      console.log(imageUrl);
       updateUserDto.profilePicture = imageUrl;
     }
 
@@ -103,16 +100,16 @@ export class UsersController {
     }
   }
 
-  @Get('/profile-picture/:userPic')
+  @Get('/profile-picture')
   // @UseGuards(JwtAuthGuard)
-  getProfilePicture(@Param('userPic') userPic: string, @Res() res: Response) {
+  getProfilePicture(@Res() res: Response) {
     const imagePath = join(
       __dirname,
       '..',
       '..',
       'images',
       'profiles pictures',
-      userPic || 'default-profile-picture.webp',
+      'default-profile-picture.webp',
     );
     res.sendFile(imagePath);
   }
