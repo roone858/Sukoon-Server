@@ -74,7 +74,7 @@ export class OrderController {
     const order = await this.orderService.getOrderById(id);
     // Allow deletion if user is admin or if the order belongs to the user
     if (
-      user.role !== 'admin' &&
+      user.role !== 'admin' ||
       order.userId?.toString() !== user._id.toString()
     ) {
       throw new ForbiddenException('You can only delete your own orders');
