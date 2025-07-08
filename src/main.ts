@@ -8,7 +8,7 @@ async function bootstrap() {
 
   const corsSetting = {
     origin: process.env.CLIENT_BASE_URL, // السماح فقط للطلبات القادمة من هذا الدومين
-    methods: 'GET,POST,PUT,DELETE', // تحديد أنواع الطلبات المسموح بها
+    methods: 'GET,POST,PUT,PATCH,DELETE', // تحديد أنواع الطلبات المسموح بها
     allowedHeaders: 'Content-Type, Authorization', // تحديد الهيدرز المسموح بها
     credentials: true, // السماح بإرسال الـ Cookies والجلسات
   };
