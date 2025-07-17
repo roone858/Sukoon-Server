@@ -4,9 +4,11 @@ import { CategoriesController } from './categories.controller';
 import { CategoriesService } from './categories.service';
 import { Category, CategorySchema } from './schemas/category.schema';
 import { UsersModule } from 'src/users/users.module';
+import { ProductModule } from 'src/product/product.module';
 
 @Module({
   imports: [
+    ProductModule,
     UsersModule,
     MongooseModule.forFeature([
       { name: Category.name, schema: CategorySchema },

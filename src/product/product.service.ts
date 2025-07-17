@@ -28,7 +28,13 @@ export class ProductService {
     const products = await this.productModel.find().lean().exec();
     return products.map(this.toProductResponseDto);
   }
-
+  async findAllByCategory(categoryId: string): Promise<ProductResponseDto[]> {
+    const products = await this.productModel
+      .find({ categories: categoryId })
+      .lean()
+      .exec();
+    return products.map(this.toProductResponseDto);
+  }
   private toProductResponseDto(
     product: ProductDocument | any,
   ): ProductResponseDto {

@@ -7,11 +7,14 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category, CategoryDocument } from './schemas/category.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { ProductService } from 'src/product/product.service';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     private readonly cloudinaryService: CloudinaryService,
+    private readonly productService: ProductService,
+
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
   ) {}
 
@@ -57,6 +60,19 @@ export class CategoriesService {
 
   async findAll(): Promise<Category[]> {
     return this.categoryModel.find().exec();
+  }
+
+  async findProductsByCategoryId(categoryId: string) {
+    return this.productService.findAllByCategory(categoryId);
+  }
+  // GET /categories/:categoryId/products
+  async findProductsByCategoryTree(categoryId: string) {
+    const category = await this.categoryModel.findById(categoryId).exec();
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+    const products = await this.productService.findAllByCategory(categoryId);
+    return products;
   }
 
   async findOne(id: string): Promise<Category> {

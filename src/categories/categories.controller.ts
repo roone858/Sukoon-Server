@@ -18,6 +18,7 @@ import { CategoryResponseDto } from './dto/category-response.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth-guard';
 import { AdminGuard } from 'src/users/guards/admin.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ProductResponseDto } from 'src/product/dto/response.product.dto';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -40,6 +41,18 @@ export class CategoriesController {
     return this.categoriesService.create(createCategoryDto, file);
   }
 
+  // GET /categories/:categoryId/products
+  @Get(':id/products')
+  @ApiOperation({ summary: 'Get products by category ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of products',
+    type: [ProductResponseDto],
+  })
+  async getProductByCategory(@Param('id') id: string) {
+    return this.categoriesService.findProductsByCategoryId(id);
+  }
+  // GET /categories
   @Get()
   @ApiOperation({ summary: 'Get all categories' })
   @ApiResponse({
