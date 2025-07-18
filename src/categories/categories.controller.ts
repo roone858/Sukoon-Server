@@ -50,7 +50,7 @@ export class CategoriesController {
     type: [ProductResponseDto],
   })
   async getProductByCategory(@Param('id') id: string) {
-    return this.categoriesService.findProductsByCategoryId(id);
+    return this.categoriesService.findProductsByCategory(id);
   }
   // GET /categories
   @Get()

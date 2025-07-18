@@ -7,14 +7,13 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category, CategoryDocument } from './schemas/category.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { ProductService } from 'src/product/product.service';
+import { Product, ProductDocument } from 'src/product/schemas/product.schema';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     private readonly cloudinaryService: CloudinaryService,
-    private readonly productService: ProductService,
-
+    @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
   ) {}
 
@@ -62,17 +61,51 @@ export class CategoriesService {
     return this.categoryModel.find().exec();
   }
 
-  async findProductsByCategoryId(categoryId: string) {
-    return this.productService.findAllByCategory(categoryId);
-  }
-  // GET /categories/:categoryId/products
-  async findProductsByCategoryTree(categoryId: string) {
-    const category = await this.categoryModel.findById(categoryId).exec();
-    if (!category) {
-      throw new NotFoundException('Category not found');
-    }
-    const products = await this.productService.findAllByCategory(categoryId);
-    return products;
+  async findProductsByCategory(categoryId: string): Promise<Product[]> {
+    // Fetch all categories once
+    const allCategories = await this.categoryModel.find().lean();
+    // Find the target category
+    const targetCategory = allCategories.find(
+      (cat) => cat._id.toString() === categoryId,
+    );
+    if (!targetCategory) throw new NotFoundException('Category not found');
+
+    // Helper to recursively collect all descendant category IDs
+    const collectDescendantIds = (
+      parentId: string,
+      categories: any[],
+    ): string[] => {
+      const children = categories.filter(
+        (cat) => String(cat.parentId) === String(parentId),
+      );
+      return children.reduce<string[]>(
+        (acc, child) => [
+          ...acc,
+          child._id.toString(),
+          ...collectDescendantIds(child._id.toString(), categories),
+        ],
+        [],
+      );
+    };
+
+    // // Collect ancestor IDs
+    // const ancestorIds = (targetCategory.ancestors || []).map((a) =>
+    //   a._id.toString(),
+    // );
+
+    // Collect descendant IDs
+    const descendantIds = collectDescendantIds(categoryId, allCategories);
+
+    // Combine all related category IDs, ensuring uniqueness
+    const allRelatedCategoryIds = Array.from(
+      new Set([categoryId, ...descendantIds]),
+      // new Set([categoryId, ...ancestorIds, ...descendantIds]),
+    );
+    // Fetch products that belong to any of the related categories
+    return this.productModel
+      .find({ categories: { $in: allRelatedCategoryIds } })
+      .populate('categories')
+      .lean();
   }
 
   async findOne(id: string): Promise<Category> {
