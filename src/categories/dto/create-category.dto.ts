@@ -44,6 +44,10 @@ export class CreateCategoryDto {
   @IsOptional()
   metaTitle?: string;
 
+  @IsOptional()
+  @IsString()
+  displayOrder?: string;
+
   @IsString()
   @IsOptional()
   metaDescription?: string;

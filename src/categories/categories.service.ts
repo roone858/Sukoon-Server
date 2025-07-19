@@ -129,7 +129,7 @@ export class CategoriesService {
     updateCategoryDto: UpdateCategoryDto,
     file: Express.Multer.File,
   ): Promise<Category> {
-    let imageUrl = updateCategoryDto.imageUrl;
+    let imageUrl = updateCategoryDto.imageUrl; // initial value
     if (file) {
       if (imageUrl)
         await this.cloudinaryService.deleteFileWithUrl(
@@ -140,8 +140,9 @@ export class CategoriesService {
       updateCategoryDto.imageUrl = imageUrl;
     }
     const updateData = { ...updateCategoryDto };
+    console.log(updateData);
     const existingCategory = await this.categoryModel
-      .findByIdAndUpdate(id, updateData, { new: true })
+      .findOneAndReplace({ _id: id }, updateData, { new: true })
       .exec();
 
     if (!existingCategory) {

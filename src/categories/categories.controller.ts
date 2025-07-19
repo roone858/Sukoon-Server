@@ -8,7 +8,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
-  Patch,
+  Put,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
@@ -106,7 +106,7 @@ export class CategoriesController {
     return this.categoriesService.getSubcategories(parentId);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @UseGuards(JwtAuthGuard, AdminGuard)
   @UseInterceptors(FileInterceptor('image'))
   @ApiOperation({ summary: 'Update category' })
@@ -121,6 +121,7 @@ export class CategoriesController {
     @Body() updateCategoryDto: UpdateCategoryDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
+    console.log(updateCategoryDto);
     return this.categoriesService.update(id, updateCategoryDto, file);
   }
 
